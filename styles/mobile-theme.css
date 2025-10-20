@@ -1,0 +1,11 @@
+:root {
+  color-scheme: dark;
+  --mobile-max-width: 420px;
+  --mobile-padding: 20px;
+}
+
+body {
+  max-width: var(--mobile-max-width);
+  margin: 0 auto;
+  padding: 0;
+}

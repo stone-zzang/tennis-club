@@ -1,0 +1,14 @@
+[
+  {
+    "name": "봄 시즌 리그",
+    "surface_type": "clay",
+    "entry_fee": 25000,
+    "max_participants": 16
+  },
+  {
+    "name": "여름 야간 컵",
+    "surface_type": "hard",
+    "entry_fee": 18000,
+    "max_participants": 12
+  }
+]

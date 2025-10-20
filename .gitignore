@@ -1,0 +1,21 @@
+# Node
+web/node_modules
+web/dist
+web/.vite
+web/coverage
+
+# Python
+.venv
+__pycache__
+*.py[cod]
+.pytest_cache
+
+# macOS
+.DS_Store
+
+# Env
+.env
+.env.*
+
+# Test artifacts
+tests/tmp_test.db

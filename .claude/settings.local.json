@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(cat:*)",
+      "Bash(source:*)",
+      "Bash(python:*)",
+      "Bash(timeout:*)",
+      "Bash(uvicorn:*)",
+      "Bash(npm run dev)",
+      "WebFetch(domain:www.figma.com)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
