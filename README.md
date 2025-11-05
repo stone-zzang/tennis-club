@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# tennis-club
-땅땅리그
-=======
 # Tennis Club Mobile League
 
 모바일 전용 테니스 리그 관리 웹앱과 FastAPI 백엔드를 위한 모노리포 템플릿입니다. 기본 데이터베이스는 SQLite이며 `.env`를 통해 다른 DB로 전환할 수 있습니다. 관리자(`role="admin"`)와 일반 회원(`role="member"`)의 역할이 분리되어 있으며, 관리자는 경기/대진표를 생성하고 회원은 참가 신청을 수행합니다.
@@ -24,7 +20,7 @@
    npm install
    ```
 
-## 로컬 실행
+## 로컬 실행111
 
 ### API (FastAPI)
 ```
@@ -67,4 +63,11 @@ npm run dev
   source .venv/bin/activate
   python -m pytest
   ```
->>>>>>> 021bbfb (Initial import)
+
+## TODO
+
+- [ ] **문서화** `TOURNAMENT_FEATURES.md` 내용을 `README.md` 주요 기능 섹션과 동기화
+- [ ] **테스트 보강** `tests/api/`에 리그 자동 대진표 생성 시나리오 추가
+- [ ] **프런트 성능** `web/src/features/league/` 렌더링 최적화 및 lazy loading 도입 검토
+- [ ] **CI 구축** GitHub Actions 워크플로로 Pytest/Vitest 병렬 실행 구성
+- [ ] **배포 자동화** Dockerfile 추가 및 staging 배포 스크립트 작성
