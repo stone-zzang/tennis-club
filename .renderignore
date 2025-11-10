@@ -1,0 +1,21 @@
+# Render.com 배포 시 제외할 파일/디렉토리
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.db
+*.sqlite
+*.sqlite3
+node_modules/
+.env
+.env.local
+*.log
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+

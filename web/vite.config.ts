@@ -8,7 +8,8 @@ export default defineConfig({
     host: true
   },
   preview: {
-    port: 4173
+    port: 4173,
+    host: true
   },
   test: {
     environment: 'jsdom',

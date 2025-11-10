@@ -77,63 +77,41 @@ npm run dev
   python -m pytest
   ```
 
-## Render 배포 가이드
+## Render.com 배포 가이드
 
-### 1. render.yaml 템플릿
-레포 루트에 `render.yaml` 파일을 생성하여 인프라 구성을 선언적으로 관리할 수 있습니다.
+### 빠른 시작
 
-```yaml
-services:
-  - type: web
-    name: tennis-club-api
-    plan: free
-    rootDir: api
-    env: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn api.main:app --host 0.0.0.0 --port $PORT
-    envVars:
-      - key: DATABASE_URL
-        sync: false  # Render Dashboard에서 Postgres 연결 문자열 입력
-  - type: static
-    name: tennis-club-web
-    plan: free
-    rootDir: web
-    buildCommand: npm install && npm run build
-    publishPath: dist
-    envVars:
-      - key: VITE_API_BASE_URL
-        value: https://tennis-club-api.onrender.com
-```
+1. **render.yaml 사용 (권장)**
+   - Render.com 대시보드에서 "New" → "Blueprint" 선택
+   - GitHub 저장소 연결
+   - `render.yaml` 파일이 자동으로 감지되어 두 개의 서비스가 생성됩니다
 
-> `sync: false`는 민감한 값을 Git에 올리지 않고 Render 대시보드에서 수동으로 관리하겠다는 의미입니다. 프론트엔드 서비스의 `VITE_API_BASE_URL` 값은 실제 배포된 API 도메인으로 교체하세요.
+2. **배포 전 로컬 테스트**
+   ```bash
+   ./scripts/render_deploy.sh
+   ```
 
-### 2. 백엔드(Web Service) 설정
-1. Render 대시보드에서 **New +** → **Web Service** → GitHub 레포 선택
-2. `Root Directory`를 `api`로 설정
-3. Build Command: `pip install -r requirements.txt`
-4. Start Command: `uvicorn api.main:app --host 0.0.0.0 --port $PORT`
-5. Python 버전은 3.11 이상으로 지정
-6. **Environment Variables**
-   - `DATABASE_URL`: Render PostgreSQL 인스턴스 생성 후 제공되는 URL 입력
-   - 필요 시 `ALLOWED_ORIGINS` 등의 추가 변수로 CORS 제한 가능
+### 상세 가이드
 
-> SQLite는 Render의 에페메럴 디스크 특성상 재시작 시 데이터가 사라집니다. 운영용 DB는 Render PostgreSQL 또는 외부 RDS를 권장합니다.
+자세한 배포 가이드는 [`RENDER_DEPLOY.md`](./RENDER_DEPLOY.md)를 참조하세요.
 
-### 3. 프론트엔드(Static Site) 설정
-1. Render 대시보드에서 **New +** → **Static Site** → 동일 레포 선택
-2. `Root Directory`를 `web`으로 설정
-3. Build Command: `npm install && npm run build`
-4. Publish Directory: `dist`
-5. Environment Variables
-   - `VITE_API_BASE_URL`: 배포된 FastAPI 서비스 URL (예: `https://tennis-club-api.onrender.com`)
+### 주요 설정 파일
 
-### 4. 도메인 및 HTTPS
-- Render가 제공하는 기본 도메인을 사용하거나, 커스텀 도메인을 연결하려면 DNS에 CNAME 레코드를 추가합니다.
-- Static Site와 Web Service 모두 자동으로 HTTPS 인증서가 발급됩니다.
+- **`render.yaml`**: Render.com 서비스 구성 파일 (백엔드 + 프론트엔드)
+- **`scripts/start_api.sh`**: 백엔드 시작 스크립트
+- **`scripts/build_web.sh`**: 프론트엔드 빌드 스크립트
+- **`scripts/start_web.sh`**: 프론트엔드 시작 스크립트
+- **`scripts/start_all.sh`**: 로컬 개발용 통합 실행 스크립트
 
-### 5. CI/CD 파이프라인
-- `render.yaml`을 커밋하면, Render에서 **Infrastructure as Code** 옵션을 활성화할 때 자동으로 서비스 구성이 갱신됩니다.
-- GitHub main 브랜치에 새로운 커밋이 푸시되면 백엔드와 프론트엔드가 각각 자동으로 재배포됩니다.
+### 환경 변수
+
+**백엔드 서비스:**
+- `DATABASE_URL`: PostgreSQL 연결 URL (Render PostgreSQL 서비스 사용 권장)
+
+**프론트엔드 서비스:**
+- `VITE_API_BASE_URL`: 백엔드 API URL (예: `https://tennis-club-api.onrender.com`)
+
+> ⚠️ **중요**: 백엔드 서비스가 배포된 후 생성된 URL을 프론트엔드의 `VITE_API_BASE_URL`에 설정해야 합니다.
 
 ## TODO
 
