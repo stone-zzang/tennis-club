@@ -6,7 +6,9 @@ export interface HttpClientOptions extends RequestInit {
 
 export async function http<T>(path: string, options: HttpClientOptions = {}): Promise<T> {
   const { parseJson = true, headers, ...init } = options;
-  const baseUrl = import.meta.env.VITE_API_BASE_URL ?? DEFAULT_API_BASE_URL;
+  // 같은 도메인에서 실행되는 경우 (통합 배포) 상대 경로 사용
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
+  const baseUrl = apiBaseUrl && apiBaseUrl !== '' ? apiBaseUrl : '';
   const response = await fetch(`${baseUrl}${path}`, {
     ...init,
     headers: {

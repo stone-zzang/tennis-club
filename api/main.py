@@ -1,5 +1,10 @@
+import os
+from pathlib import Path
+
 from fastapi import Depends, FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
 from api.db.models import Base
@@ -38,14 +43,24 @@ app.add_middleware(
   allow_headers=["*"]
 )
 
+# 프론트엔드 정적 파일 서빙 설정
+WEB_DIST_PATH = Path(__file__).parent.parent / "web" / "dist"
+if WEB_DIST_PATH.exists():
+  # 정적 파일 (JS, CSS, 이미지 등) 서빙
+  app.mount("/assets", StaticFiles(directory=str(WEB_DIST_PATH / "assets")), name="assets")
+  
+  # Vite의 다른 정적 파일들도 서빙
+  if (WEB_DIST_PATH / "favicon.svg").exists():
+    app.mount("/favicon.svg", StaticFiles(directory=str(WEB_DIST_PATH)), name="favicon")
+
 
 @app.on_event('startup')
 def on_startup() -> None:
   Base.metadata.create_all(bind=engine)
 
 
-@app.get("/", status_code=status.HTTP_200_OK)
-async def root() -> dict[str, str]:
+@app.get("/api", status_code=status.HTTP_200_OK)
+async def api_root() -> dict[str, str]:
   return {
     "message": "Tennis Club League API",
     "version": "0.1.0",
@@ -328,3 +343,18 @@ async def update_match(
     court=payload.court
   )
   return LeagueMatchResponse.model_validate(match, from_attributes=True)
+
+
+# SPA 라우팅을 위한 catch-all: 모든 API 경로가 아닌 요청은 프론트엔드로
+# 이 라우트는 모든 API 라우트 정의 후에 와야 함
+if WEB_DIST_PATH.exists():
+  @app.get("/{full_path:path}")
+  async def serve_frontend(full_path: str):
+    # API 경로는 제외 (이미 위에서 처리됨)
+    if full_path.startswith(("api", "docs", "openapi.json", "health", "assets", "favicon")):
+      return None
+    
+    index_path = WEB_DIST_PATH / "index.html"
+    if index_path.exists():
+      return FileResponse(str(index_path))
+    return {"message": "Frontend not built. Run 'cd web && npm run build'"}

@@ -84,12 +84,11 @@ npm run dev
 1. **render.yaml 사용 (권장)**
    - Render.com 대시보드에서 "New" → "Blueprint" 선택
    - GitHub 저장소 연결
-   - `render.yaml` 파일이 자동으로 감지되어 두 개의 서비스가 생성됩니다
+   - `render.yaml` 파일이 자동으로 감지되어 통합 서비스가 생성됩니다
 
-2. **배포 전 로컬 테스트**
-   ```bash
-   ./scripts/render_deploy.sh
-   ```
+2. **수동 배포**
+   - **Build Command**: `pip install -r api/requirements.txt && cd web && npm ci && npm run build && cd ..`
+   - **Start Command**: `python -m uvicorn api.main:app --host 0.0.0.0 --port $PORT`
 
 ### 상세 가이드
 
@@ -97,21 +96,19 @@ npm run dev
 
 ### 주요 설정 파일
 
-- **`render.yaml`**: Render.com 서비스 구성 파일 (백엔드 + 프론트엔드)
-- **`scripts/start_api.sh`**: 백엔드 시작 스크립트
+- **`render.yaml`**: Render.com 통합 서비스 구성 파일
+- **`scripts/build_and_start.sh`**: 통합 빌드 및 시작 스크립트
+- **`scripts/start_api.sh`**: 백엔드 시작 스크립트 (로컬 개발용)
 - **`scripts/build_web.sh`**: 프론트엔드 빌드 스크립트
-- **`scripts/start_web.sh`**: 프론트엔드 시작 스크립트
+- **`scripts/start_web.sh`**: 프론트엔드 시작 스크립트 (로컬 개발용)
 - **`scripts/start_all.sh`**: 로컬 개발용 통합 실행 스크립트
 
 ### 환경 변수
 
-**백엔드 서비스:**
 - `DATABASE_URL`: PostgreSQL 연결 URL (Render PostgreSQL 서비스 사용 권장)
+- `VITE_API_BASE_URL`: (선택사항) 통합 배포 시 빈 문자열로 두면 같은 도메인에서 API 호출
 
-**프론트엔드 서비스:**
-- `VITE_API_BASE_URL`: 백엔드 API URL (예: `https://tennis-club-api.onrender.com`)
-
-> ⚠️ **중요**: 백엔드 서비스가 배포된 후 생성된 URL을 프론트엔드의 `VITE_API_BASE_URL`에 설정해야 합니다.
+> ✅ **통합 배포**: 프론트엔드와 백엔드가 하나의 서비스로 배포되어 같은 URL에서 접근 가능합니다.
 
 ## TODO
 

@@ -4,9 +4,9 @@
 
 ## 배포 구조
 
-이 프로젝트는 두 개의 서비스로 구성됩니다:
-1. **백엔드 API** (`tennis-club-api`) - FastAPI 서버
-2. **프론트엔드 웹** (`tennis-club-web`) - React 애플리케이션
+이 프로젝트는 **하나의 통합 서비스**로 배포됩니다:
+- **백엔드 API** (FastAPI)가 프론트엔드 정적 파일도 함께 서빙합니다
+- 하나의 URL로 프론트엔드와 백엔드 모두 접근 가능합니다
 
 ## 배포 방법
 
@@ -14,35 +14,28 @@
 
 1. Render.com 대시보드에서 "New" → "Blueprint" 선택
 2. GitHub 저장소 연결
-3. `render.yaml` 파일이 자동으로 감지되어 두 개의 서비스가 생성됩니다
+3. `render.yaml` 파일이 자동으로 감지되어 통합 서비스가 생성됩니다
 
 ### 방법 2: 수동 배포
-
-#### 백엔드 API 서비스 생성
 
 1. Render.com 대시보드에서 "New" → "Web Service" 선택
 2. GitHub 저장소 연결
 3. 설정:
-   - **Name**: `tennis-club-api`
+   - **Name**: `tennis-club`
    - **Environment**: `Python 3`
-   - **Build Command**: `pip install -r api/requirements.txt`
-   - **Start Command**: `python -m uvicorn api.main:app --host 0.0.0.0 --port $PORT`
+   - **Build Command**: 
+     ```bash
+     pip install -r api/requirements.txt && cd web && npm ci && npm run build && cd ..
+     ```
+   - **Start Command**: 
+     ```bash
+     python -m uvicorn api.main:app --host 0.0.0.0 --port $PORT
+     ```
    - **Health Check Path**: `/health`
-
-#### 프론트엔드 웹 서비스 생성
-
-1. Render.com 대시보드에서 "New" → "Web Service" 선택
-2. 같은 GitHub 저장소 연결
-3. 설정:
-   - **Name**: `tennis-club-web`
-   - **Environment**: `Node`
-   - **Build Command**: `cd web && npm ci && npm run build`
-   - **Start Command**: `cd web && npm run preview -- --host 0.0.0.0 --port $PORT`
-   - **Static Publish Path**: `web/dist` (선택사항)
+   - **Python Version**: `3.11.0`
+   - **Node Version**: `20.18.0` (빌드에 필요)
 
 ## 환경 변수 설정
-
-### 백엔드 API 서비스
 
 다음 환경 변수를 설정하세요:
 
@@ -53,15 +46,11 @@
 
 - `PYTHON_VERSION`: `3.11.0` (선택사항)
 
-### 프론트엔드 웹 서비스
+- `NODE_VERSION`: `20.18.0` (빌드에 필요)
 
-다음 환경 변수를 설정하세요:
-
-- `VITE_API_BASE_URL`: 백엔드 API의 URL
-  - 예: `https://tennis-club-api.onrender.com`
-  - **중요**: 백엔드 서비스가 배포된 후 URL을 확인하여 설정하세요
-
-- `NODE_VERSION`: `20.18.0` (선택사항)
+- `VITE_API_BASE_URL`: (선택사항)
+  - 통합 배포의 경우 빈 문자열로 두면 같은 도메인에서 API를 호출합니다
+  - 별도 도메인에서 API를 호출해야 하는 경우에만 설정하세요
 
 ## 데이터베이스 설정
 
@@ -79,13 +68,14 @@ SQLite는 파일 기반이므로 Render.com의 임시 파일 시스템에 저장
 
 ## 배포 후 확인
 
-1. 백엔드 API가 정상 작동하는지 확인:
-   - `https://your-api.onrender.com/health` 접속
-   - `https://your-api.onrender.com/docs` 접속하여 API 문서 확인
+1. 프론트엔드가 정상 작동하는지 확인:
+   - `https://your-service.onrender.com` 접속
+   - 애플리케이션이 정상적으로 로드되는지 확인
 
-2. 프론트엔드가 정상 작동하는지 확인:
-   - `https://your-web.onrender.com` 접속
-   - 브라우저 개발자 도구에서 API 호출이 정상인지 확인
+2. 백엔드 API가 정상 작동하는지 확인:
+   - `https://your-service.onrender.com/health` 접속
+   - `https://your-service.onrender.com/docs` 접속하여 API 문서 확인
+   - 프론트엔드에서 API 호출이 정상인지 브라우저 개발자 도구로 확인
 
 ## 로컬 개발
 
