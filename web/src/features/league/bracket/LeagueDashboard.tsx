@@ -72,10 +72,10 @@ export function LeagueDashboard(): JSX.Element {
       setError(null);
       try {
         const [leagueResponse, applicants, scheduledMatches, prelimStatus] = await Promise.all([
-          getLeague(leagueId),
-          listLeagueApplications(leagueId),
-          listLeagueMatches(leagueId),
-          checkPreliminaryStatus(leagueId).catch(() => null)
+          getLeague(leagueId!),
+          listLeagueApplications(leagueId!),
+          listLeagueMatches(leagueId!),
+          checkPreliminaryStatus(leagueId!).catch(() => null)
         ]);
         if (!isMounted) return;
         setLeague(leagueResponse);
@@ -192,12 +192,12 @@ export function LeagueDashboard(): JSX.Element {
     setBracketStatus('submitting');
     setBracketError(null);
     try {
-      const generatedMatches = await generateBracket(leagueId, {
+      const generatedMatches = await generateBracket(leagueId!, {
         admin_id: currentMember.id,
         groups_count: groupsInput,
         courts_count: courtsInput
       });
-      const refreshedLeague = await getLeague(leagueId);
+      const refreshedLeague = await getLeague(leagueId!);
       setMatches(generatedMatches);
       setLeague(refreshedLeague);
       setBracketStatus('success');
@@ -225,8 +225,8 @@ export function LeagueDashboard(): JSX.Element {
     try {
       await updateMatchScore(matchId, { score_a: scoreA, score_b: scoreB });
       const [updatedMatches, prelimStatus] = await Promise.all([
-        listLeagueMatches(leagueId),
-        checkPreliminaryStatus(leagueId).catch(() => null)
+        listLeagueMatches(leagueId!),
+        checkPreliminaryStatus(leagueId!).catch(() => null)
       ]);
       setMatches(updatedMatches);
       setPreliminaryStatus(prelimStatus);
@@ -245,8 +245,8 @@ export function LeagueDashboard(): JSX.Element {
     if (!leagueId || !window.confirm('참가 신청을 취소하시겠습니까?')) return;
 
     try {
-      await cancelApplication(leagueId, memberId);
-      const applicants = await listLeagueApplications(leagueId);
+      await cancelApplication(leagueId!, memberId);
+      const applicants = await listLeagueApplications(leagueId!);
       setApplications(applicants);
     } catch (err) {
       alert(err instanceof Error ? err.message : '참가 취소에 실패했습니다');
@@ -259,16 +259,16 @@ export function LeagueDashboard(): JSX.Element {
     setFinalStageError(null);
 
     try {
-      await generateFinalStage(leagueId, {
+      await generateFinalStage(leagueId!, {
         admin_id: currentMember.id,
         mode: finalStageMode,
         courts_count: courtsInput,
         num_matches: finalStageMode === 'ranked_play' ? rankedMatchCount : undefined
       });
       const [refreshedLeague, updatedMatches, prelimStatus] = await Promise.all([
-        getLeague(leagueId),
-        listLeagueMatches(leagueId),
-        checkPreliminaryStatus(leagueId).catch(() => null)
+        getLeague(leagueId!),
+        listLeagueMatches(leagueId!),
+        checkPreliminaryStatus(leagueId!).catch(() => null)
       ]);
       setLeague(refreshedLeague);
       setMatches(updatedMatches);
@@ -303,7 +303,7 @@ export function LeagueDashboard(): JSX.Element {
         scheduled_at: new Date(editInputs.scheduled_at).toISOString(),
         court: editInputs.court
       });
-      const updatedMatches = await listLeagueMatches(leagueId);
+      const updatedMatches = await listLeagueMatches(leagueId!);
       setMatches(updatedMatches);
       setEditingMatch(null);
     } catch (err) {

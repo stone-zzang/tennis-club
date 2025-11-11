@@ -21,7 +21,7 @@ export function ApplyScreen(): JSX.Element {
       setStatus('loading');
       setError(null);
       try {
-        const response = await getLeague(leagueId);
+        const response = await getLeague(leagueId!);
         if (isMounted) {
           setLeague(response);
           setStatus('loaded');
@@ -53,7 +53,7 @@ export function ApplyScreen(): JSX.Element {
     setApplyStatus('submitting');
     setError(null);
     try {
-      await applyToLeague(leagueId, currentMember.id);
+      await applyToLeague(leagueId!, currentMember.id);
       setApplyStatus('success');
     } catch (err) {
       setError(err instanceof Error ? err.message : '참가 신청에 실패했습니다');
